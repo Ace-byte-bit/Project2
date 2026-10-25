@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Habit Tracker</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        .today {
+            text-align: center;
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        /* ===== ADD FORM ===== */
+        .add-form {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        #habitInput {
+            flex: 1;
+            padding: 14px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            transition: border-color 0.2s;
+        }
+        #habitInput:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        #addBtn {
+            padding: 14px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+        #addBtn:hover {
+            background: #5568d3;
+        }
+
+        /* ===== STATS ===== */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 15px;
+            background: #f7f7f7;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+        .stat {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 25px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== HABIT LIST ===== */
+        #habitList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #habitList li {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s;
+            border-left: 4px solid #ddd;
+        }
+        #habitList li.done-today {
+            background: #e8f5e9;
+            border-left-color: #4CAF50;
+        }
+
+        /* ===== CHECK BUTTON ===== */
+        .check-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid #ccc;
+            background: white;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .check-btn:hover {
+            border-color: #4CAF50;
+        }
+        .check-btn.done {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+
+        /* ===== HABIT INFO ===== */
+        .habit-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .habit-name {
+            font-size: 16px;
+            font-weight: 500;
+            color: #333;
+            margin: 0 0 4px;
+            word-wrap: break-word;
+        }
+        .habit-streak {
+            font-size: 13px;
+            color: #888;
+        }
+        .habit-streak.fire {
+            color: #ff9800;
+            font-weight: bold;
+        }
+
+        /* ===== ACTION BUTTONS ===== */
+        .habit-actions {
+            display: flex;
+            gap: 6px;
+            flex-shrink: 0;
+        }
+        .dup-btn {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .dup-btn:hover {
+            background: #1976D2;
+        }
+        .delete-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .delete-btn:hover {
+            background: #d32f2f;
+        }
+
+        /* ===== EMPTY STATE ===== */
+        #emptyState {
+            text-align: center;
+            color: #999;
+            padding: 40px 20px;
+        }
+        #emptyState.hidden {
+            display: none;
+        }
+        #emptyState .emoji {
+            font-size: 48px;
+            margin: 0;
+        }
+        #emptyState .title {
+            font-size: 16px;
+            color: #666;
+            margin: 10px 0 0;
+            font-weight: 500;
+        }
+        #emptyState .subtitle {
+            font-size: 14px;
+            color: #999;
+            margin: 5px 0 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 Habit Tracker</h1>
+        <p class="today" id="todayDate"></p>
+
+        <!-- Add habit form -->
+        <div class="add-form">
+            <input type="text" id="habitInput" placeholder="New habit (e.g., Read 30 min)">
+            <button id="addBtn">Add</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value" id="totalHabits">0</div>
+                <div class="stat-label">Habits</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="doneToday">0</div>
+                <div class="stat-label">Done Today</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="bestStreak">0</div>
+                <div class="stat-label">Best Streak</div>
+            </div>
+        </div>
+
+        <!-- Habit list -->
+        <ul id="habitList"></ul>
+
+        <!-- Empty state -->
+        <div id="emptyState">
+            <p class="emoji">📝</p>
+            <p class="title">No habits yet</p>
+            <p class="subtitle">Add one above to start tracking your daily progress!</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
